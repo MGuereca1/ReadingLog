@@ -8,7 +8,6 @@ export default function AddBookForm(props) {
         title: '',
         author: '',
         totalPages: '',
-        currentPage: 0,
         notes: ''
   })
 
@@ -28,20 +27,20 @@ export default function AddBookForm(props) {
       return
     }
 
-    //!!!!!!!!!!!! MODIFY FOR START AND END PAGE!!!!!!!!!!!!!!!!!
-
-    // Create the book object
+    // Create the book object with reading sessions array
     const newBook = {
       id: Date.now(), // Simple ID generation
       title: formData.title,
       author: formData.author,
       totalPages: parseInt(formData.totalPages) || 0,
-      currentPage: parseInt(formData.currentPage) || 0,
-      progress: formData.totalPages ? Math.round((formData.currentPage / formData.totalPages) * 100) : 0,
-      status: formData.currentPage === 0 ? 'to-read' : 'reading',
+      currentPage: 0,
+      progress: 0, // Will be calculated from reading sessions
+      status: 'to-read',
       rating: 0,
-      startDate: new Date().toISOString().split('T')[0],
-      notes: formData.notes
+      notes: formData.notes,
+      readingSessions: [], // Array to store reading sessions
+      startDate: null,
+      endDate: null
     }
 
     onAddBook(newBook);
@@ -51,7 +50,6 @@ export default function AddBookForm(props) {
       title: '',
       author: '',
       totalPages: '',
-      currentPage: 0,
       notes: ''
     })
     
@@ -64,7 +62,6 @@ export default function AddBookForm(props) {
       title: '',
       author: '',
       totalPages: '',
-      currentPage: 0,
       notes: ''
     })
     onClose()
@@ -114,20 +111,6 @@ export default function AddBookForm(props) {
             className="form-input"
             placeholder="Total number of pages"
             min="1"
-          />
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">Current Page</label>
-          <input
-            type="number"
-            name="currentPage"
-            value={formData.currentPage}
-            onChange={handleChange}
-            className="form-input"
-            placeholder="Page you're currently on"
-            min="0"
-            max={formData.totalPages || undefined}
           />
         </div>
 
