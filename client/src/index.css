@@ -686,3 +686,58 @@ button:focus-visible {
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
+
+/* Delete button styles for table */
+.delete-btn-table {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.delete-btn-table:hover {
+  background-color: #c82333;
+}
+
+/* Inline confirmation for table */
+.delete-confirm-inline {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.confirm-delete-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.confirm-delete-btn:hover {
+  background-color: #c82333;
+}
+
+.cancel-delete-btn {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.cancel-delete-btn:hover {
+  background-color: #5a6268;
+}

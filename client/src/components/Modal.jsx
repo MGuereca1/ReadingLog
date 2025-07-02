@@ -30,7 +30,7 @@ export default function Modal(props){
             <div className='modal-content' onClick={(e) => e.stopPropagation()}>
                 {/* modal header */}
                 <div className='modal-header'>
-                    <h2 className='modal-tile'>{title}</h2>
+                    <h2 className='modal-title'>{title}</h2>
                     <button onClick={onClose} className='modal-close-btn' aria-label='Close Modal'>
                     <X className='close-icon'/>
                     </button>

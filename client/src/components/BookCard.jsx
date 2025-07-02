@@ -1,44 +1,58 @@
-import { Star } from 'lucide-react';
-const BookCard = ({ book, onClick }) => {
+// Add this to your BookCard component
+import { useState } from 'react';
+
+const BookCard = ({ book, onClick, onDeleteBook }) => {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleDeleteClick = (e) => {
+    e.stopPropagation(); // Prevent opening the modal
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = (e) => {
+    e.stopPropagation();
+    onDeleteBook(book.id);
+    setShowDeleteConfirm(false);
+  };
+
+  const handleCancelDelete = (e) => {
+    e.stopPropagation();
+    setShowDeleteConfirm(false);
+  };
+
   return (
-    <div 
-      className="book-card"
-      onClick={() => onClick && onClick(book)}
-    >
-      <div className="book-cover-container">
-        <img 
-          src={book.cover} 
-          alt={book.title}
-          className="book-cover"
-        />
-        <div className="progress-overlay">
-          <div className="progress-container">
-            <div className="progress-bar-bg">
-              <div 
-                className="progress-bar-fill"
-                style={{ width: `${book.progress}%` }}
-              ></div>
+    <div className="book-card" onClick={() => onClick(book)}>
+      <img src={book.cover} alt={book.title} />
+      <div className="book-info">
+        <h3>{book.title}</h3>
+        <p>{book.author}</p>
+      </div>
+      
+      {/* Delete button */}
+      <button 
+        className="delete-btn book-card-delete" 
+        onClick={handleDeleteClick}
+        title="Delete book"
+      >
+        ×
+      </button>
+
+      {/* Confirmation dialog */}
+      {showDeleteConfirm && (
+        <div className="delete-confirm-overlay" onClick={handleCancelDelete}>
+          <div className="delete-confirm-dialog" onClick={(e) => e.stopPropagation()}>
+            <p>Delete "{book.title}"?</p>
+            <div className="delete-confirm-buttons">
+              <button onClick={handleConfirmDelete} className="confirm-delete-btn">
+                Delete
+              </button>
+              <button onClick={handleCancelDelete} className="cancel-delete-btn">
+                Cancel
+              </button>
             </div>
-            <p className="progress-text">{book.progress}% complete</p>
           </div>
         </div>
-      </div>
-      <h3 className="book-title">{book.title}</h3>
-      <p className="book-author">{book.author}</p>
-      <div className="book-footer">
-        <span className={`status-badge ${
-          book.status === 'completed' ? 'status-completed' : 'status-reading'
-        }`}>
-          {book.status}
-        </span>
-        {book.rating > 0 && (
-          <div className="rating-container">
-            {[...Array(book.rating)].map((_, i) => (
-              <Star key={i} className="star" />
-            ))}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };

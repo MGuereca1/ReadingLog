@@ -1,6 +1,9 @@
-import { Star } from 'lucide-react';
+import { Star, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
-export default function BookTable({ books, onBookClick }) {
+export default function BookTable({ books, onBookClick, onDeleteBook }) {
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'completed':
@@ -12,6 +15,22 @@ export default function BookTable({ books, onBookClick }) {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const handleDeleteClick = (book, e) => {
+    e.stopPropagation(); // Prevent row click
+    setDeleteConfirm(book.id);
+  };
+
+  const handleConfirmDelete = (bookId, e) => {
+    e.stopPropagation();
+    onDeleteBook(bookId);
+    setDeleteConfirm(null);
+  };
+
+  const handleCancelDelete = (e) => {
+    e.stopPropagation();
+    setDeleteConfirm(null);
   };
 
   if (books.length === 0) {
@@ -34,6 +53,7 @@ export default function BookTable({ books, onBookClick }) {
               <th className="table-header-cell">Status</th>
               <th className="table-header-cell">Rating</th>
               <th className="table-header-cell">Date Started</th>
+              {onDeleteBook && <th className="table-header-cell">Actions</th>}
             </tr>
           </thead>
           <tbody className="table-body">
@@ -86,6 +106,36 @@ export default function BookTable({ books, onBookClick }) {
                 <td className="table-cell">
                   <span className="date-text">{book.startDate || '-'}</span>
                 </td>
+                {onDeleteBook && (
+                  <td className="table-cell">
+                    {deleteConfirm === book.id ? (
+                      <div className="delete-confirm-inline">
+                        <button 
+                          onClick={(e) => handleConfirmDelete(book.id, e)}
+                          className="confirm-delete-btn"
+                          title="Confirm delete"
+                        >
+                          Yes
+                        </button>
+                        <button 
+                          onClick={handleCancelDelete}
+                          className="cancel-delete-btn"
+                          title="Cancel delete"
+                        >
+                          No
+                        </button>
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={(e) => handleDeleteClick(book, e)}
+                        className="delete-btn-table"
+                        title="Delete book"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
