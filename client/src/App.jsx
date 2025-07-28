@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import Layout from './components/layout'
 import BookTable from './components/BookTable'
@@ -33,6 +31,7 @@ function App() {
       const booksData = await BookService.getAllBooks()
 
       // transform data to match your frontend structure
+      // MAY NEED TO DELETE THAT BOOK COVER OR CHANGE DEFAULT TO A DIFFERENT IMAGE
       const transformedBooks = booksData.map(book => ({
         ...book,
         id: book._id, //mongodb uses _id but frontend uses id
@@ -57,12 +56,25 @@ function App() {
 // Function to add a new book
   const handleAddBook = async (newBookData) => {
     try {
-      const createdBook = await BookService.createBook(newBookData);
+      // Prepare data for API - include coverImage if provided
+      const apiBookData = {
+        title: newBookData.title,
+        author: newBookData.author,
+        totalPages: newBookData.totalPages,
+        notes: newBookData.notes,
+        rating: newBookData.rating || 0,
+        status: newBookData.status || 'to-read',
+        readingSessions: newBookData.readingSessions || [],
+        cover: newBookData.cover // Include the cover image
+      };
+
+      const createdBook = await BookService.createBook(apiBookData);
       
       // Transform the created book to match frontend structure
       const transformedBook = {
         ...createdBook,
         id: createdBook._id,
+        // Use the uploaded cover image if available, otherwise use fallback
         cover: createdBook.cover || `https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&h=300&fit=crop&auto=format&q=80&sig=${createdBook._id}`,
         readingSessions: createdBook.readingSessions || []
       };
@@ -88,7 +100,8 @@ function App() {
         totalPages: updatedBookData.totalPages,
         notes: updatedBookData.notes,
         rating: updatedBookData.rating,
-        readingSessions: updatedBookData.readingSessions
+        readingSessions: updatedBookData.readingSessions,
+        cover: updatedBookData.cover // Include cover image in updates
       };
       
       const updatedBook = await BookService.updateBook(bookId, apiUpdateData);
@@ -97,7 +110,8 @@ function App() {
       const transformedBook = {
         ...updatedBook,
         id: updatedBook._id,
-        cover: updatedBook.cover || updatedBookData.cover,
+        // Use the updated cover image if available, otherwise keep existing or use fallback
+        cover: updatedBook.cover || `https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&h=300&fit=crop&auto=format&q=80&sig=${updatedBook._id}`,
         readingSessions: updatedBook.readingSessions || []
       };
       

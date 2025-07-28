@@ -33,6 +33,9 @@
 
     }
 }
+.header-controls{
+  margin-left: 25px;
+}
 
 .title{
   font-size: 2rem;
@@ -338,16 +341,147 @@ button:focus-visible {
   border-bottom: 1px solid #e5e7eb;
 }
 
-.book-cover-container {
-  flex-shrink: 0;
-}
+/* BOOK COVER STARTS HERE */
 
-.book-cover-large {
-  width: 100px;
-  height: 150px;
+.book-cover, .book-cover-large {
+  width: 170px;
+  height: 180px; /* Slightly taller too */
   object-fit: cover;
   border-radius: 8px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.book-cover-small{
+  width: 100px;
+  height: 120px; /* Slightly taller too */
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.book-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  max-width: 220px; /* Increased from 200px to accommodate wider images */
+}
+
+.book-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Update your existing .book-info to center text */
+.book-info {
+  text-align: center;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.book-info h3 {
+  margin: 0 0 4px 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+  line-height: 1.2;
+}
+
+.book-info p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+  line-height: 1.2;
+}
+
+/* Update delete button positioning */
+.delete-btn-card {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: rgba(220, 53, 69, 0.9);
+  color: white;
+  border: none;
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease, background-color 0.2s;
+}
+
+.book-card:hover .delete-btn-card {
+  opacity: 1;
+}
+
+.delete-btn-card:hover {
+  background-color: rgba(200, 35, 51, 0.9);
+}
+
+/* Confirmation dialog styles */
+.delete-confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.delete-confirm-dialog {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  min-width: 300px;
+}
+
+.delete-confirm-dialog p {
+  margin: 0 0 20px 0;
+  font-size: 1rem;
+  color: #374151;
+}
+
+.delete-confirm-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* Image Preview Styles for Add Book Form */
+.img-preview-container {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.img-preview {
+  max-width: 150px;
+  max-height: 200px;
+  object-fit: contain;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.btn-rmv-img{
+  padding: 5px 10px;
+  font-size: 12px;
 }
 
 .book-details {
@@ -593,13 +727,6 @@ button:focus-visible {
   gap: 12px;
 }
 
-.book-cover-small {
-  width: 40px;
-  height: 56px;
-  object-fit: cover;
-  border-radius: 4px;
-  flex-shrink: 0;
-}
 
 .book-title {
   font-weight: 500;
@@ -688,7 +815,7 @@ button:focus-visible {
 }
 
 /* Delete button styles for table */
-.delete-btn-table {
+.delete-btn-table, .delete-btn-card{
   background-color: #dc3545;
   color: white;
   border: none;
@@ -741,3 +868,68 @@ button:focus-visible {
 .cancel-delete-btn:hover {
   background-color: #5a6268;
 }
+
+
+/* Add Session Form Specific Styles */
+.add-session-form {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Small form groups for compact layouts */
+.form-group-small {
+  margin-bottom: 12px; /* Reduced from standard 20px */
+}
+
+.form-group-small .form-label-small {
+  display: block;
+  font-size: 0.75rem; /* Smaller than standard 0.875rem */
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.form-group-small .form-input-small {
+  width: 100%;
+  padding: 8px 12px; /* Smaller padding than standard */
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.form-group-small .form-input-small:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Session form specific row layout */
+.session-form-row {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+}
+
+.session-form-row .form-group-small {
+  flex: 1;
+}
+
+/* Responsive adjustments for session form */
+@media (max-width: 480px) {
+  .session-form-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .add-session-form {
+    padding: 16px;
+    max-width: none;
+  }
+}
+

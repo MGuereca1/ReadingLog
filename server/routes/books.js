@@ -10,9 +10,8 @@ import { ObjectId } from "mongodb";
 // The router will be added as a middleware and will take control of requests starting with path /record.
 const router = express.Router()
 
-
 // helper function to calculate the progress percentage of the book
-const calculateProgress  = (sessions, totalPages) => {
+const calculateProgress = (sessions, totalPages) => {
     if(!totalPages || sessions.length === 0) return 0
     const MaxPageRead = Math.max(...sessions.map(session => session.endPage))
     return Math.min(Math.round((MaxPageRead / totalPages) * 100), 100)
@@ -20,15 +19,15 @@ const calculateProgress  = (sessions, totalPages) => {
 
 // helper function to determine book status
 const getBookStatus = (progress) => {
-    if(progress == 0) return 'to read'
-    if (progress == 100) return ' completed'
+    if(progress == 0) return 'to-read'
+    if (progress == 100) return 'completed'
     return 'reading'
 }
 
 // get all the books
 router.get("/", async (req, res) => {
     try{
-        let collection = await db.collection("books") // will appear in the collection of the cluster
+        let collection = await db.collection("books")
         let results = await collection.find({}).toArray()
         res.status(200).send(results)
     } catch (err) {
@@ -59,17 +58,32 @@ router.get("/:id", async (req, res) => {
 // create a new book
 router.post("/", async (req, res) => {
     try {
-        //validate required fields
-        const { title, author, totalPages, notes} = req.body
+        // validate required fields
+        const { title, author, totalPages, notes, cover } = req.body
 
         if(!title || !author ){
             return res.status(400).send("Missing required fields: title and author")
         }
 
+        // validate cover image if provided
+        if (cover) {
+            // check if it's a valid base64 data URL
+            if (!cover.startsWith('data:image/')) {
+                return res.status(400).send("Invalid image format. Must be a valid base64 data URL.")
+            }
+            
+            // optional: check base64 string size (roughly 4/3 of original file size)
+            // 5MB file = ~6.7MB base64, add some buffer
+            const maxBase64Size = 8 * 1024 * 1024; // 8MB in base64 for 10MB images
+            if (cover.length > maxBase64Size) {
+                return res.status(400).send("Image too large. Please use an image smaller than 5MB.")
+            }
+        }
+
         let newBook = {
             title: title,
             author: author,
-            totalPages: parseInt(totalPages) || 0, // parseInt is used because all data that comes from HTTP requests are initially string so 25 would be read as "25"
+            totalPages: parseInt(totalPages) || 0,
             currentPage: 0,
             progress: 0,
             status: 'to-read',
@@ -78,17 +92,16 @@ router.post("/", async (req, res) => {
             readingSessions: [],
             startDate: null,
             endDate: null,
-            cover: null,
+            cover: cover || null, // store the base64 string or null
             createdAt: new Date(),
             updatedAt: new Date()
-
         }
 
         let collection = await db.collection("books")
         let result = await collection.insertOne(newBook)
 
-        //return created doc with its ID
-        const createdBook =  await collection.findOne({ _id: result.insertedId})
+        // return created doc with its ID
+        const createdBook = await collection.findOne({ _id: result.insertedId})
         res.status(201).send(createdBook)
 
     } catch (err) {
@@ -97,27 +110,43 @@ router.post("/", async (req, res) => {
     }
 })
 
-// to update book (for reading sessions)
+// to update book (for reading sessions and other fields including cover)
 router.patch("/:id", async (req, res) => {
     try {
         const query = { _id: new ObjectId(req.params.id)}
 
-        //get current book
+        // get current book
         const currentBook = await db.collection("books").findOne(query)
         if (!currentBook){
             return res.status(404).send("Book not found")
         }
 
         const updateFields = {}
-        const { title, author, totalPages, notes, rating, readingSessions } = req.body
+        const { title, author, totalPages, notes, rating, readingSessions, cover } = req.body
 
         // update the basic fields
-        if ( title !== undefined) updateFields.title = title
-        if ( author !== undefined) updateFields.author = author
-        if ( totalPages !== undefined) updateFields.totalPages = parseInt(totalPages)
-        if ( notes !== undefined) updateFields.notes = notes
-        if ( rating !== undefined) updateFields.rating = parseInt(rating)
+        if (title !== undefined) updateFields.title = title
+        if (author !== undefined) updateFields.author = author
+        if (totalPages !== undefined) updateFields.totalPages = parseInt(totalPages)
+        if (notes !== undefined) updateFields.notes = notes
+        if (rating !== undefined) updateFields.rating = parseInt(rating)
         
+        // handle cover image update
+        if (cover !== undefined) {
+            if (cover === null) {
+                // explicitly removing cover
+                updateFields.cover = null
+            } else if (cover.startsWith('data:image/')) {
+                // validate base64 image
+                const maxBase64Size = 15 * 1024 * 1024; // 15MB in base64 for 10MB images
+                if (cover.length > maxBase64Size) {
+                    return res.status(400).send("Image too large. Please use an image smaller than 10MB.")
+                }
+                updateFields.cover = cover
+            } else {
+                return res.status(400).send("Invalid image format. Must be a valid base64 data URL.")
+            }
+        }
 
         // handle reading sessions update
         if (readingSessions !== undefined){
@@ -155,7 +184,7 @@ router.patch("/:id", async (req, res) => {
         let result = await collection.updateOne(query, {$set: updateFields})
 
         if(result.matchedCount === 0){
-            res.status(400).send("Book not found")    
+            res.status(404).send("Book not found")    
         } else{
             // return the updated doc
             const updatedBook = await collection.findOne(query)
@@ -167,8 +196,7 @@ router.patch("/:id", async (req, res) => {
     }
 })
 
-
-//  to delete a record
+// to delete a record
 router.delete("/:id", async (req, res) => {
     try {
         const query = { _id: new ObjectId(req.params.id)}

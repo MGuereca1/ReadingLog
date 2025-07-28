@@ -1,5 +1,6 @@
 // Add this to your BookCard component
 import { useState } from 'react';
+import {Trash2 } from 'lucide-react';
 
 const BookCard = ({ book, onClick, onDeleteBook }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -22,7 +23,8 @@ const BookCard = ({ book, onClick, onDeleteBook }) => {
 
   return (
     <div className="book-card" onClick={() => onClick(book)}>
-      <img src={book.cover} alt={book.title} />
+      {/* modify image size */}
+      <img className="book-cover" src={book.cover} alt={book.title} />
       <div className="book-info">
         <h3>{book.title}</h3>
         <p>{book.author}</p>
@@ -30,11 +32,12 @@ const BookCard = ({ book, onClick, onDeleteBook }) => {
       
       {/* Delete button */}
       <button 
-        className="delete-btn book-card-delete" 
+        className="delete-btn-card" 
         onClick={handleDeleteClick}
         title="Delete book"
       >
-        ×
+        {/* have been using lucide reatc for project instead of fontawesome */}
+        <Trash2 size={16} />
       </button>
 
       {/* Confirmation dialog */}

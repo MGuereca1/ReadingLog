@@ -66,7 +66,7 @@ export default function BookTable({ books, onBookClick, onDeleteBook }) {
                 <td className="table-cell">
                   <div className="book-info">
                     <img 
-                      src={book.cover || "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&h=300&fit=crop"} 
+                      src={book.cover} 
                       alt={book.title}
                       className="book-cover-small"
                     />
